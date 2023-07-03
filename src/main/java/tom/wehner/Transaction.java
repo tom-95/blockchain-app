@@ -1,11 +1,17 @@
 package tom.wehner;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+
 import java.util.Objects;
 
 public class Transaction {
 
+    @NotBlank
     private String sender;
+    @NotBlank
     private String receiver;
+    @Positive
     private float amount;
 
     public Transaction(String sender, String receiver, float amount) {
