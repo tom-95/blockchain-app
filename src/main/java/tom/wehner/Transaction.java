@@ -3,7 +3,6 @@ package tom.wehner;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 
-import java.util.Objects;
 
 public class Transaction {
 
@@ -11,12 +10,15 @@ public class Transaction {
     private String sender;
     @NotBlank
     private String receiver;
+    @NotBlank
+    private String purpose;
     @Positive
     private float amount;
 
-    public Transaction(String sender, String receiver, float amount) {
+    public Transaction(String sender, String receiver, String purpose, float amount) {
         this.sender = sender;
         this.receiver = receiver;
+        this.purpose = purpose;
         this.amount = amount;
     }
 
@@ -24,25 +26,8 @@ public class Transaction {
 
     public String getReceiver() { return receiver; }
 
+    public String getPurpose() { return purpose; }
+
     public float getAmount() { return amount; }
-
-//    @Override
-//    public boolean equals(Object o) {
-//
-//        if (o == this) {
-//            return true;
-//        }
-//
-//        if (!(o instanceof Transaction transaction)) {
-//            return false;
-//        }
-//
-//        return sender.equals(transaction.getSender()) && receiver.equals(transaction.getReceiver()) && (0 == Float.compare(amount, transaction.getAmount()));
-//    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(sender, receiver, amount);
-    }
 
 }
