@@ -30,12 +30,13 @@ public class BlockchainController {
     private static final String CHAINCODE_NAME = System.getenv().getOrDefault("CHAINCODE_NAME", "ba");
 
     // Path to crypto materials.
-    private static ClassLoader classLoader = BlockchainController.class.getClassLoader();
-    private static URL resourceUrl = classLoader.getResource("org1.example.com");
+    private static final ClassLoader classLoader = BlockchainController.class.getClassLoader();
+    private static final URL resourceUrl = classLoader.getResource("org1.example.com");
     private static final Path CRYPTO_PATH;
 
     static {
         try {
+            assert resourceUrl != null;
             CRYPTO_PATH = Paths.get(resourceUrl.toURI());
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
@@ -51,7 +52,7 @@ public class BlockchainController {
     private static final Path TLS_CERT_PATH = CRYPTO_PATH.resolve(Paths.get("peers/peer0.org1.example.com/tls/ca.crt"));
 
     // Gateway peer end point.
-    private static final String PEER_ENDPOINT = "35.157.94.228:7051";
+    private static final String PEER_ENDPOINT = "3.66.223.210:7051";
     private static final String OVERRIDE_AUTH = "peer0.org1.example.com";
 
     private Contract contract;
@@ -82,12 +83,12 @@ public class BlockchainController {
      * Submit a transaction synchronously, blocking until it has been committed to
      * the ledger.
      */
-    public void createAsset(Transaction transaction) throws CertificateException, IOException, InvalidKeyException, InterruptedException, EndorseException, CommitException, SubmitException, CommitStatusException {
+    public void createAsset(Payment payment) throws CertificateException, IOException, InvalidKeyException, InterruptedException, EndorseException, CommitException, SubmitException, CommitStatusException {
         connect();
 
         System.out.println("\n--> Submit Transaction: CreateAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments");
 
-        contract.submitTransaction("CreateAsset", assetId, transaction.getSender(), transaction.getReceiver(), transaction.getPurpose(), String.valueOf(transaction.getAmount()));
+        contract.submitTransaction("CreateAsset", assetId, payment.getSender(), payment.getReceiver(), payment.getPurpose(), String.valueOf(payment.getAmount()));
         //contract.submitTransaction("CreateAsset", assetId, "yellow", "5", "Tom", "1300");
 
         System.out.println("*** Transaction committed successfully");

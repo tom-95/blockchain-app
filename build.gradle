@@ -14,7 +14,10 @@ dependencies {
     implementation 'io.quarkus:quarkus-resteasy-reactive-jackson'
     implementation 'io.quarkus:quarkus-arc'
     implementation 'io.quarkus:quarkus-hibernate-validator:3.2.0.Final'
+    implementation 'io.quarkus:quarkus-hibernate-orm'
+    implementation 'io.quarkus:quarkus-jdbc-mysql'
     implementation 'org.hyperledger.fabric:fabric-gateway:1.2.2'
+    compileOnly 'javax.ws.rs:javax.ws.rs-api:2.1.1'
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
 }

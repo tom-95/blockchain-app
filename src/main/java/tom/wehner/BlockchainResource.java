@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.cert.CertificateException;
 
-@Path("/api")
+@Path("/api/hyperledger")
 public class BlockchainResource {
 
     @Inject
@@ -28,9 +28,9 @@ public class BlockchainResource {
     @Path("/transaction")
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public void sendTransaction(@Valid Transaction transaction) throws EndorseException, CommitException, SubmitException, CommitStatusException, CertificateException, IOException, InvalidKeyException, InterruptedException {
+    public void sendPayment(@Valid Payment payment) throws EndorseException, CommitException, SubmitException, CommitStatusException, CertificateException, IOException, InvalidKeyException, InterruptedException {
 
-        controller.createAsset(transaction);
+        controller.createAsset(payment);
 
     }
 
