@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Positive;
 
 public class Payment {
 
-
     private int id;
     @NotBlank
     private String sender;

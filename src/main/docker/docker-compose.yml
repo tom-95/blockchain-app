@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  mysql:
+    ports:
+      - "3306:3306"
+    image: "mysql"
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin_123
+      - MYSQL_DATABASE=TEST
+    restart: always
+  mongodb:
+    ports:
+      - "27017:27017"
+    image: "mongo"

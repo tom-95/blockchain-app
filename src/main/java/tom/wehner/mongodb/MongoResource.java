@@ -1,4 +1,4 @@
-package tom.wehner.mysql;
+package tom.wehner.mongodb;
 
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -8,16 +8,16 @@ import tom.wehner.Payment;
 
 import java.util.List;
 
-@Path("/api/mysql")
-public class MySQLResource {
+@Path("/api/mongo")
+public class MongoResource {
 
     @Inject
-    PaymentController controller;
+    MongoController controller;
 
     @Path("/blockchain")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Payment> getBlockchain() {
+    public List<MongoEntity> getBlockchain() {
 
         return controller.getPayments();
 
