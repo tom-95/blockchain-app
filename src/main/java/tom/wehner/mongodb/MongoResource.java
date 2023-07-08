@@ -12,14 +12,14 @@ import java.util.List;
 public class MongoResource {
 
     @Inject
-    MongoController controller;
+    MongoRepository repository;
 
     @Path("/blockchain")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<MongoEntity> getBlockchain() {
 
-        return controller.getPayments();
+        return repository.findAll().list();
 
     }
 
@@ -28,7 +28,7 @@ public class MongoResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public void sendPayment(@Valid Payment payment) {
 
-        controller.createPayment(payment);
+        repository.persist(new MongoEntity(payment));
 
     }
 
