@@ -27,7 +27,7 @@ public class BlockchainController {
 
     private static final String MSP_ID = System.getenv().getOrDefault("MSP_ID", "Org1MSP");
     private static final String CHANNEL_NAME = System.getenv().getOrDefault("CHANNEL_NAME", "mychannel");
-    private static final String CHAINCODE_NAME = System.getenv().getOrDefault("CHAINCODE_NAME", "ba");
+    private static final String CHAINCODE_NAME = System.getenv().getOrDefault("CHAINCODE_NAME", "basic");
 
     // Path to crypto materials.
     private static final ClassLoader classLoader = BlockchainController.class.getClassLoader();
@@ -83,15 +83,10 @@ public class BlockchainController {
      * Submit a transaction synchronously, blocking until it has been committed to
      * the ledger.
      */
-    public void createAsset(Payment payment) throws CertificateException, IOException, InvalidKeyException, InterruptedException, EndorseException, CommitException, SubmitException, CommitStatusException {
+    public void transfer(Payment payment) throws CertificateException, IOException, InvalidKeyException, InterruptedException, EndorseException, CommitException, SubmitException, CommitStatusException {
         connect();
 
-        System.out.println("\n--> Submit Transaction: CreateAsset, creates new asset with ID, Color, Size, Owner and AppraisedValue arguments");
-
-        contract.submitTransaction("CreateAsset", assetId, payment.getSender(), payment.getReceiver(), payment.getPurpose(), String.valueOf(payment.getAmount()));
-        //contract.submitTransaction("CreateAsset", assetId, "yellow", "5", "Tom", "1300");
-
-        System.out.println("*** Transaction committed successfully");
+        contract.submitTransaction("Transfer", "account_" + payment.getSender().toLowerCase(), "account_" + payment.getReceiver().toLowerCase(), String.valueOf(payment.getAmount()));
 
         channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
     }
@@ -107,6 +102,16 @@ public class BlockchainController {
         byte[] result = contract.evaluateTransaction("GetAllAssets");
 
         System.out.println("*** Result: " + prettyJson(result));
+
+        channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
+
+        return prettyJson(result);
+    }
+
+    public String getAssetHistory() throws CertificateException, IOException, InvalidKeyException, InterruptedException, EndorseException, CommitException, SubmitException, CommitStatusException {
+        connect();
+
+        byte[] result = contract.submitTransaction("GetAssetHistory", "account_tom");
 
         channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
 

@@ -16,12 +16,21 @@ public class BlockchainResource {
     @Inject
     BlockchainController controller;
 
-    @Path("/blockchain")
+    @Path("/accounts")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String getBlockchain() throws GatewayException, CertificateException, IOException, InvalidKeyException, InterruptedException {
+    public String getAccounts() throws GatewayException, CertificateException, IOException, InvalidKeyException, InterruptedException {
 
         return controller.getAllAssets();
+
+    }
+
+    @Path("/history")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getHistory() throws GatewayException, CertificateException, IOException, InvalidKeyException, InterruptedException, CommitException {
+
+        return controller.getAssetHistory();
 
     }
 
@@ -30,7 +39,7 @@ public class BlockchainResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public void sendPayment(@Valid Payment payment) throws EndorseException, CommitException, SubmitException, CommitStatusException, CertificateException, IOException, InvalidKeyException, InterruptedException {
 
-        controller.createAsset(payment);
+        controller.transfer(payment);
 
     }
 
