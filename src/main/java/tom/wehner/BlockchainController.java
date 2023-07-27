@@ -52,12 +52,12 @@ public class BlockchainController {
     private static final Path TLS_CERT_PATH = CRYPTO_PATH.resolve(Paths.get("peers/peer0.org1.example.com/tls/ca.crt"));
 
     // Gateway peer end point.
-    private static final String PEER_ENDPOINT = "3.66.223.210:7051";
+    private static final String PEER_ENDPOINT = "localhost:7051";
     private static final String OVERRIDE_AUTH = "peer0.org1.example.com";
 
     private Contract contract;
     private ManagedChannel channel;
-    private final String assetId = "asset" + Instant.now().toEpochMilli();
+    private final String assetId = "transfer" + Instant.now().toEpochMilli();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public BlockchainController() throws URISyntaxException {
@@ -86,7 +86,7 @@ public class BlockchainController {
     public void transfer(Payment payment) throws CertificateException, IOException, InvalidKeyException, InterruptedException, EndorseException, CommitException, SubmitException, CommitStatusException {
         connect();
 
-        contract.submitTransaction("Transfer", "account_" + payment.getSender().toLowerCase(), "account_" + payment.getReceiver().toLowerCase(), String.valueOf(payment.getAmount()));
+        contract.submitTransaction("Transfer", assetId, "account_" + payment.getSender().toLowerCase(), "account_" + payment.getReceiver().toLowerCase(), payment.getPurpose(), String.valueOf(payment.getAmount()));
 
         channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
     }
@@ -94,24 +94,20 @@ public class BlockchainController {
     /**
      * Evaluate a transaction to query ledger state.
      */
-    public String getAllAssets() throws GatewayException, CertificateException, IOException, InvalidKeyException, InterruptedException {
+    public String getAllTransactions() throws GatewayException, CertificateException, IOException, InvalidKeyException, InterruptedException {
         connect();
 
-        System.out.println("\n--> Evaluate Transaction: GetAllAssets, function returns all the current assets on the ledger");
-
-        byte[] result = contract.evaluateTransaction("GetAllAssets");
-
-        System.out.println("*** Result: " + prettyJson(result));
+        byte[] result = contract.evaluateTransaction("QueryTransfers");
 
         channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
 
         return prettyJson(result);
     }
 
-    public String getAssetHistory() throws CertificateException, IOException, InvalidKeyException, InterruptedException, EndorseException, CommitException, SubmitException, CommitStatusException {
+    public String getAssetHistory(String user) throws CertificateException, IOException, InvalidKeyException, InterruptedException, EndorseException, CommitException, SubmitException, CommitStatusException {
         connect();
 
-        byte[] result = contract.submitTransaction("GetAssetHistory", "account_tom");
+        byte[] result = contract.submitTransaction("GetAssetHistory", "account_" + user.toLowerCase());
 
         channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
 

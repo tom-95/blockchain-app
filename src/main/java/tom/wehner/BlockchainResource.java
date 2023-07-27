@@ -16,21 +16,21 @@ public class BlockchainResource {
     @Inject
     BlockchainController controller;
 
-    @Path("/accounts")
+    @Path("/transactions")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String getAccounts() throws GatewayException, CertificateException, IOException, InvalidKeyException, InterruptedException {
+    public String getTransactions() throws GatewayException, CertificateException, IOException, InvalidKeyException, InterruptedException {
 
-        return controller.getAllAssets();
+        return controller.getAllTransactions();
 
     }
 
-    @Path("/history")
+    @Path("/history/{user}")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String getHistory() throws GatewayException, CertificateException, IOException, InvalidKeyException, InterruptedException, CommitException {
+    public String getHistory(@PathParam("user") String user) throws GatewayException, CertificateException, IOException, InvalidKeyException, InterruptedException, CommitException {
 
-        return controller.getAssetHistory();
+        return controller.getAssetHistory(user);
 
     }
 
