@@ -104,10 +104,10 @@ public class BlockchainController {
         return prettyJson(result);
     }
 
-    public String getAssetHistory(String user) throws CertificateException, IOException, InvalidKeyException, InterruptedException, EndorseException, CommitException, SubmitException, CommitStatusException {
+    public String getAssetHistory(String user) throws CertificateException, IOException, InvalidKeyException, InterruptedException, GatewayException, CommitException {
         connect();
 
-        byte[] result = contract.submitTransaction("GetAssetHistory", "account_" + user.toLowerCase());
+        byte[] result = contract.evaluateTransaction("GetAssetHistory", "account_" + user.toLowerCase());
 
         channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
 
