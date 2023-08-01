@@ -22,6 +22,9 @@ public class PaymentController {
     AccountBalanceRepository accountBalanceRepository;
 
     @Inject
+    PaymentRepository paymentRepository;
+
+    @Inject
     UserTransaction transaction;
 
     public List<AccountBalance> getHistory() {
@@ -31,13 +34,10 @@ public class PaymentController {
         return history;
     }
 
-    public List<AccountBalance> getLatest() {
+    public List<Payment> getTransactions() {
 
-        List<AccountBalance> result = new ArrayList<>();
-        AccountBalanceEntity newest = accountBalanceRepository.getNewest("account_tom");
-        result.add(new AccountBalance(newest.getId(), newest.getAccountName(), newest.getTimestamp(), newest.getBalance()));
-        newest = accountBalanceRepository.getNewest("account_vermieter");
-        result.add(new AccountBalance(newest.getId(), newest.getAccountName(), newest.getTimestamp(), newest.getBalance()));
+        List<Payment> result = new ArrayList<>();
+        paymentRepository.getAll().forEach(entity -> result.add(new Payment(entity.getId(), entity.getSender(), entity.getReceiver(), entity.getPurpose(), entity.getAmount())));
         return result;
     }
 
@@ -75,6 +75,7 @@ public class PaymentController {
             transaction.begin();
             accountBalanceRepository.add(sender);
             accountBalanceRepository.add(receiver);
+            paymentRepository.add(new PaymentEntity(payment.getSender(), payment.getReceiver(), payment.getPurpose(), payment.getAmount()));
             transaction.commit();
         } catch (EntityExistsException e) {
             throw new AlreadyExistsException("Unable to create payment", e);

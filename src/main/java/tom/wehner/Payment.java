@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Positive;
 
 public class Payment {
 
+    private Integer id;
     @NotBlank
     private String sender;
     @NotBlank
@@ -21,6 +22,20 @@ public class Payment {
         this.purpose = purpose;
         this.amount = amount;
     }
+
+    public Payment(Integer id, String sender, String receiver, String purpose, float amount) {
+        this.id = id;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.purpose = purpose;
+        this.amount = amount;
+    }
+
+    public Payment() { }
+
+    public Integer getId() { return id; }
+
+    public void setId(Integer id) { this.id = id; }
 
     public String getSender() { return sender; }
 

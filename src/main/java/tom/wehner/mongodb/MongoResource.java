@@ -16,14 +16,16 @@ import java.util.List;
 public class MongoResource {
 
     @Inject
-    MongoRepository repository;
+    MongoBalanceRepository balanceRepository;
+    @Inject
+    MongoPaymentRepository paymentRepository;
 
     @Path("/history")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public List<MongoAccountBalance> getHistory() {
 
-        return repository.list("accountName", "account_tom");
+        return balanceRepository.list("accountName", "account_tom");
 
     }
 
@@ -31,30 +33,17 @@ public class MongoResource {
     @POST
     public void initiate() {
 
-        repository.persist(new MongoAccountBalance("account_tom", LocalDateTime.now(), 10000));
-        repository.persist(new MongoAccountBalance("account_vermieter", LocalDateTime.now(), 0));
+        balanceRepository.persist(new MongoAccountBalance("account_tom", LocalDateTime.now(), 10000));
+        balanceRepository.persist(new MongoAccountBalance("account_vermieter", LocalDateTime.now(), 0));
 
     }
 
-    @Path("/latest")
+    @Path("/transactions")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<MongoAccountBalance> getLatest() {
+    public List<MongoPayment> getTransactions() {
 
-        List<MongoAccountBalance> result = new ArrayList<>();
-
-        List<MongoAccountBalance> list = repository.list("accountName", "account_tom");
-        list.sort((entity1, entity2) -> entity2.getTimestamp().compareTo(entity1.getTimestamp()));
-        MongoAccountBalance latestSender = list.get(0);
-
-        list = repository.list("accountName", "account_vermieter");
-        list.sort((entity1, entity2) -> entity2.getTimestamp().compareTo(entity1.getTimestamp()));
-        MongoAccountBalance latestReceiver = list.get(0);
-
-        result.add(latestSender);
-        result.add(latestReceiver);
-
-        return result;
+        return paymentRepository.listAll();
 
     }
 
@@ -63,16 +52,17 @@ public class MongoResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public void sendPayment(@Valid Payment payment) {
 
-        List<MongoAccountBalance> list = repository.list("accountName", "account_" + payment.getSender().toLowerCase());
+        List<MongoAccountBalance> list = balanceRepository.list("accountName", "account_" + payment.getSender().toLowerCase());
         list.sort((entity1, entity2) -> entity2.getTimestamp().compareTo(entity1.getTimestamp()));
         MongoAccountBalance latestSender = list.get(0);
 
-        list = repository.list("accountName", "account_" + payment.getReceiver().toLowerCase());
+        list = balanceRepository.list("accountName", "account_" + payment.getReceiver().toLowerCase());
         list.sort((entity1, entity2) -> entity2.getTimestamp().compareTo(entity1.getTimestamp()));
         MongoAccountBalance latestReceiver = list.get(0);
 
-        repository.persist(new MongoAccountBalance("account_" + payment.getSender().toLowerCase(), LocalDateTime.now(), latestSender.getBalance() - payment.getAmount()));
-        repository.persist(new MongoAccountBalance("account_" + payment.getReceiver().toLowerCase(), LocalDateTime.now(), latestReceiver.getBalance() + payment.getAmount()));
+        balanceRepository.persist(new MongoAccountBalance("account_" + payment.getSender().toLowerCase(), LocalDateTime.now(), latestSender.getBalance() - payment.getAmount()));
+        balanceRepository.persist(new MongoAccountBalance("account_" + payment.getReceiver().toLowerCase(), LocalDateTime.now(), latestReceiver.getBalance() + payment.getAmount()));
+        paymentRepository.persist(new MongoPayment(payment.getSender(), payment.getReceiver(), payment.getPurpose(), payment.getAmount()));
 
     }
 

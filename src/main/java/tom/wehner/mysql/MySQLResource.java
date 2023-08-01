@@ -24,12 +24,12 @@ public class MySQLResource {
 
     }
 
-    @Path("/latest")
+    @Path("/transactions")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<AccountBalance> getLatest() {
+    public List<Payment> getTransactions() {
 
-        return controller.getLatest();
+        return controller.getTransactions();
 
     }
 
