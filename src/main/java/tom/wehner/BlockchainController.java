@@ -6,7 +6,11 @@ import com.google.gson.JsonParser;
 import io.grpc.Grpc;
 import io.grpc.ManagedChannel;
 import io.grpc.TlsChannelCredentials;
+import io.quarkus.runtime.StartupEvent;
+import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.event.Observes;
 import org.hyperledger.fabric.client.*;
 import org.hyperledger.fabric.client.identity.*;
 
@@ -22,7 +26,7 @@ import java.security.cert.CertificateException;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
-@RequestScoped
+@ApplicationScoped
 public class BlockchainController {
 
     private static final String MSP_ID = System.getenv().getOrDefault("MSP_ID", "Org1MSP");
@@ -57,10 +61,18 @@ public class BlockchainController {
 
     private Contract contract;
     private ManagedChannel channel;
-    private final String assetId = "transfer" + Instant.now().toEpochMilli();
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public BlockchainController() throws URISyntaxException {
+    }
+
+    void onStart(@Observes StartupEvent event) throws CertificateException, IOException, InvalidKeyException, InterruptedException {
+        connect();
+    }
+
+    @PreDestroy
+    void onShutdown() throws InterruptedException {
+        channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
     }
 
     private void connect() throws IOException, CertificateException, InvalidKeyException, InterruptedException {
@@ -84,32 +96,33 @@ public class BlockchainController {
      * the ledger.
      */
     public void transfer(Payment payment) throws CertificateException, IOException, InvalidKeyException, InterruptedException, EndorseException, CommitException, SubmitException, CommitStatusException {
-        connect();
+        //connect();
+        String assetId = "transfer" + Instant.now().toEpochMilli();
 
         contract.submitTransaction("Transfer", assetId, "account_" + payment.getSender().toLowerCase(), "account_" + payment.getReceiver().toLowerCase(), payment.getPurpose(), String.valueOf(payment.getAmount()));
 
-        channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
+        //channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
     }
 
     /**
      * Evaluate a transaction to query ledger state.
      */
     public String getAllTransactions() throws GatewayException, CertificateException, IOException, InvalidKeyException, InterruptedException {
-        connect();
+        //connect();
 
         byte[] result = contract.evaluateTransaction("QueryTransfers");
 
-        channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
+        //channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
 
         return prettyJson(result);
     }
 
     public String getAssetHistory(String user) throws CertificateException, IOException, InvalidKeyException, InterruptedException, GatewayException, CommitException {
-        connect();
+        //connect();
 
         byte[] result = contract.evaluateTransaction("GetAssetHistory", "account_" + user.toLowerCase());
 
-        channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
+        //channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
 
         return prettyJson(result);
     }
