@@ -66,16 +66,12 @@ public class BlockchainController {
     public BlockchainController() throws URISyntaxException {
     }
 
-    void onStart(@Observes StartupEvent event) throws CertificateException, IOException, InvalidKeyException, InterruptedException {
-        connect();
-    }
-
     @PreDestroy
     void onShutdown() throws InterruptedException {
         channel.shutdownNow().awaitTermination(5, TimeUnit.SECONDS);
     }
 
-    private void connect() throws IOException, CertificateException, InvalidKeyException, InterruptedException {
+    void connect(@Observes StartupEvent event) throws IOException, CertificateException, InvalidKeyException, InterruptedException {
 
         channel = newGrpcConnection();
 
